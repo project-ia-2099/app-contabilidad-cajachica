@@ -53,3 +53,14 @@ Decisiones de implementación: moneda y fondo inicial configurados por Contabili
 - [x] 5. Documentar ejecución, preparar contenedores, revisar cambios y abrir PR sin fusionar. Entrega: https://github.com/project-ia-2099/app-contabilidad-cajachica/pull/1 (rama feat/initial-app).
 
 Validación final: 17 pruebas xUnit, 7 Vitest y 2 pruebas Edge (escritorio/móvil) aprobadas. TypeScript y build de producción correctos; npm audit: cero vulnerabilidades. Aplicación local iniciada con migración SQL y /health=ok; revisión mediante navegador real sin errores y caja sin datos de prueba. Scripts de inicio y parada, documentación y contenedores preparados. Docker no está disponible en esta máquina; no se ejecutó build de imágenes. SDK local 11.0.100 con destino y runtime .NET 10; CI y Docker usan SDK 10. Despliegue cloud deshabilitado hasta integrar acceso corporativo. Rama publicada y PR #1 abierto; sin fusión a main.
+
+### Demo QA sin inicio de sesión — aprobado el 2026-11-17
+El usuario solicita omitir autenticación por tratarse de una demostración. El despliegue hacia GCP debe ejecutarse exclusivamente desde GitHub Actions, nunca desde la computadora local. Se conserva el flujo de revisión: 888Leonidas888 revisa y fusiona el PR a main.
+
+- [x] Confirmar que el PR #1 fue fusionado por 888Leonidas888 y que los filtros TI pasaron en main.
+- [x] Revisar el bloqueo actual de QA y las dependencias del pipeline; solo se realizaron consultas de GCP, sin despliegue local.
+- [x] Ajustar el workflow para publicar QA sin exigir autenticación de usuarios, incluyendo el origen CORS del frontend y disparo por cambios del workflow. El pipeline verifica API, CORS y frontend antes de presentar enlaces. Producción mantiene su condición independiente.
+- [x] Validar el cambio y abrir PR para revisión y fusión por 888Leonidas888. actionlint 1.7.12 sin errores y diff verificado; PR #2: https://github.com/project-ia-2099/app-contabilidad-cajachica/pull/2, rama fix/qa-demo. Revisión solicitada a 888Leonidas888.
+- [ ] Tras la fusión, seguir GitHub Actions y entregar la URL de QA cuando finalice correctamente.
+
+La producción conserva su control independiente y aprobación requerida. Los servicios QA se usarán para la demostración; no ingresar datos contables reales.

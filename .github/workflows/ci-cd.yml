@@ -6,11 +6,13 @@ on:
     paths:
       - 'backend/**'
       - 'frontend/**'
+      - '.github/workflows/ci-cd.yml'
   push:
     branches: [ main ]
     paths:
       - 'backend/**'
       - 'frontend/**'
+      - '.github/workflows/ci-cd.yml'
   workflow_dispatch:
 
 env:
@@ -76,8 +78,9 @@ jobs:
   deploy-qa:
     name: "Fase 3: Deploy Automático a QA (Cloud Run)"
     needs: [ti-gatekeeper-backend, ti-gatekeeper-frontend]
-    if: vars.ENABLE_CLOUD_DEPLOYMENT == 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     environment:
       name: qa
       url: ${{ steps.deploy-web-qa.outputs.url }}
@@ -129,7 +132,26 @@ jobs:
           image: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ github.event.repository.name }}-web-qa:${{ github.sha }}
           flags: --allow-unauthenticated --port=8080
 
-      - name: Publicar Enlaces Oficiales de QA
+      - name: Configurar origen y verificar la demo QA
+        env:
+          API_SERVICE: ${{ github.event.repository.name }}-api-qa
+          API_URL: ${{ steps.deploy-api-qa.outputs.url }}
+          WEB_URL: ${{ steps.deploy-web-qa.outputs.url }}
+        run: |
+          gcloud run services update "$API_SERVICE" \
+            --region "$REGION" \
+            --update-env-vars="AllowedOrigins__0=$WEB_URL" \
+            --quiet
+          curl --fail --silent --show-error --retry 5 --retry-all-errors --retry-delay 5 \
+            "$API_URL/health" --output /dev/null
+          HEADERS=$(curl --fail --silent --show-error --retry 5 --retry-all-errors --retry-delay 5 \
+            --header "Origin: $WEB_URL" --dump-header - --output /dev/null "$API_URL/api/summary")
+          printf '%s\n' "$HEADERS" | tr -d '\r' | grep --fixed-strings --ignore-case --line-regexp \
+            "access-control-allow-origin: $WEB_URL"
+          curl --fail --silent --show-error --retry 5 --retry-all-errors --retry-delay 5 \
+            "$WEB_URL" --output /dev/null
+
+      - name: Publicar enlaces de la demo QA verificada
         run: |
           echo "### 🚀 Entorno QA Desplegado (Google Cloud Run)" >> $GITHUB_STEP_SUMMARY
           echo "| Componente | Enlace Oficial QA | Base de Datos (Secret Manager) |" >> $GITHUB_STEP_SUMMARY

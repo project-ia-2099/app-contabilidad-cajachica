@@ -107,6 +107,10 @@ dotnet ef migrations add NombreDelCambio --project backend/Cash.Infrastructure -
 
 Los Dockerfiles usan .NET 10 y Node 26, con nginx en el frontend. `docker compose up --build` requiere `SQL_PASSWORD` y `CASH_CONNECTION_STRING` desde el entorno, fuera del repositorio; la conexión debe apuntar al servicio `sqlserver`. El volumen `cash-sql` conserva datos. Los puertos publicados se limitan a 127.0.0.1.
 
-El repositorio tiene entornos QA y producción; producción requiere revisión de TI. El workflow comprueba backend e interfaz en cada PR. El despliegue cloud queda deshabilitado por defecto: esta versión no incluye autenticación corporativa. Antes de habilitar `ENABLE_CLOUD_DEPLOYMENT=true`, TI debe integrar el acceso autorizado y configurar `AllowedOrigins` con la URL del frontend. No publique esta versión con acceso público a los datos contables.
+El repositorio tiene entornos QA y producción; producción requiere revisión de TI. El workflow comprueba backend e interfaz en cada PR. Por solicitud del usuario, QA se habilita como demostración sin inicio de sesión y debe utilizar únicamente datos ficticios.
+
+La publicación en GCP se ejecuta exclusivamente desde GitHub Actions. Después de que 888Leonidas888 revise y fusione el PR a `main`, el pipeline ejecuta los filtros TI, construye las imágenes y despliega API y frontend de QA. Configura automáticamente CORS con la URL del frontend y verifica la salud de la API, el acceso desde ese origen y la página antes de publicar los enlaces en el resumen de Actions. También puede iniciarse desde **Actions → Golden Path CI/CD → Run workflow**, seleccionando `main`.
+
+El pase a producción conserva su condición independiente `ENABLE_CLOUD_DEPLOYMENT=true` y la aprobación obligatoria del entorno `production`; habilitar la demo QA no habilita esa variable. La autenticación corporativa se posterga para una versión posterior al demo. No se ejecutan comandos locales de despliegue hacia GCP.
 
 Los cambios se entregan en una rama y un Pull Request, sin fusionarse automáticamente a `main`.
