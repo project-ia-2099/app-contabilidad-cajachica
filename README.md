@@ -111,6 +111,14 @@ El repositorio tiene entornos QA y producción; producción requiere revisión d
 
 La publicación en GCP se ejecuta exclusivamente desde GitHub Actions. Después de que 888Leonidas888 revise y fusione el PR a `main`, el pipeline ejecuta los filtros TI, construye las imágenes y despliega API y frontend de QA. Configura automáticamente CORS con la URL del frontend y verifica la salud de la API, el acceso desde ese origen y la página antes de publicar los enlaces en el resumen de Actions. También puede iniciarse desde **Actions → Golden Path CI/CD → Run workflow**, seleccionando `main`.
 
-El pase a producción conserva su condición independiente `ENABLE_CLOUD_DEPLOYMENT=true` y la aprobación obligatoria del entorno `production`; habilitar la demo QA no habilita esa variable. La autenticación corporativa se posterga para una versión posterior al demo. No se ejecutan comandos locales de despliegue hacia GCP.
+El pase a producción puede solicitarse desde **Actions → Golden Path CI/CD → Run workflow**, seleccionando `main` y marcando **Publicar también la demo en producción**. La casilla está desmarcada por defecto; no hace falta activar una variable permanente del repositorio para esta demostración. El pipeline ejecuta filtros y QA antes de esperar la aprobación obligatoria de **888Leonidas888** en el entorno `production`. Tras aprobarse, publica la API con la conexión de producción, construye el frontend para esa API, configura CORS y comprueba ambos servicios antes de mostrar los enlaces.
+
+Para iniciarlo mediante GitHub CLI después de la revisión y fusión del cambio:
+
+```powershell
+gh workflow run ci-cd.yml --ref main -f deploy_production=true
+```
+
+La condición independiente existente `ENABLE_CLOUD_DEPLOYMENT=true` sigue siendo compatible. Habilitar QA no activa producción. La autenticación corporativa se posterga por solicitud del usuario para esta demo, que debe usar datos ficticios. No se ejecutan comandos locales de despliegue hacia GCP: GitHub CLI únicamente solicita la ejecución del pipeline de GitHub Actions.
 
 Los cambios se entregan en una rama y un Pull Request, sin fusionarse automáticamente a `main`.
