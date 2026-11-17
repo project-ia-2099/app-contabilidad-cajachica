@@ -64,3 +64,13 @@ El usuario solicita omitir autenticación por tratarse de una demostración. El 
 - [ ] Tras la fusión, seguir GitHub Actions y entregar la URL de QA cuando finalice correctamente.
 
 La producción conserva su control independiente y aprobación requerida. Los servicios QA se usarán para la demostración; no ingresar datos contables reales.
+
+### Demo en producción — solicitud del usuario el 2026-11-17
+El usuario confirma conformidad con QA y solicita continuar con una demostración en producción, manteniendo por ahora la aplicación sin inicio de sesión. Toda publicación en GCP debe ejecutarse exclusivamente desde GitHub Actions. El entorno production conserva la aprobación de 888Leonidas888.
+
+- [x] Verificar que el PR #2 fue fusionado y el job QA del run 44115931405 terminó correctamente.
+- [x] Registrar conformidad del usuario con QA.
+- [x] Preparar configuración CORS y comprobaciones de salud en producción, y ejecución manual explícita para el pase sin cambiar variables permanentes del repositorio. Casilla deploy_production desmarcada por defecto; se mantiene la aprobación requerida en production.
+- [ ] Validar workflow y abrir PR para revisión y fusión por 888Leonidas888.
+- [ ] Iniciar el pipeline desde GitHub sobre main aprobado; esperar aprobación del entorno production por el revisor.
+- [ ] Verificar el despliegue y entregar el enlace oficial de producción.
