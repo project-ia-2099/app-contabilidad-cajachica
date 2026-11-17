@@ -71,6 +71,6 @@ El usuario confirma conformidad con QA y solicita continuar con una demostració
 - [x] Verificar que el PR #2 fue fusionado y el job QA del run 44115931405 terminó correctamente.
 - [x] Registrar conformidad del usuario con QA.
 - [x] Preparar configuración CORS y comprobaciones de salud en producción, y ejecución manual explícita para el pase sin cambiar variables permanentes del repositorio. Casilla deploy_production desmarcada por defecto; se mantiene la aprobación requerida en production.
-- [ ] Validar workflow y abrir PR para revisión y fusión por 888Leonidas888.
+- [x] Validar workflow y abrir PR para revisión y fusión por 888Leonidas888. actionlint 1.7.12 y diff correctos; PR #3: https://github.com/project-ia-2099/app-contabilidad-cajachica/pull/3, rama fix/production-demo. Revisión solicitada a 888Leonidas888.
 - [ ] Iniciar el pipeline desde GitHub sobre main aprobado; esperar aprobación del entorno production por el revisor.
 - [ ] Verificar el despliegue y entregar el enlace oficial de producción.
