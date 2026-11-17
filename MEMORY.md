@@ -60,7 +60,7 @@ El usuario solicita omitir autenticación por tratarse de una demostración. El 
 - [x] Confirmar que el PR #1 fue fusionado por 888Leonidas888 y que los filtros TI pasaron en main.
 - [x] Revisar el bloqueo actual de QA y las dependencias del pipeline; solo se realizaron consultas de GCP, sin despliegue local.
 - [x] Ajustar el workflow para publicar QA sin exigir autenticación de usuarios, incluyendo el origen CORS del frontend y disparo por cambios del workflow. El pipeline verifica API, CORS y frontend antes de presentar enlaces. Producción mantiene su condición independiente.
-- [ ] Validar el cambio y abrir PR para revisión y fusión por 888Leonidas888.
+- [x] Validar el cambio y abrir PR para revisión y fusión por 888Leonidas888. actionlint 1.7.12 sin errores y diff verificado; PR #2: https://github.com/project-ia-2099/app-contabilidad-cajachica/pull/2, rama fix/qa-demo. Revisión solicitada a 888Leonidas888.
 - [ ] Tras la fusión, seguir GitHub Actions y entregar la URL de QA cuando finalice correctamente.
 
 La producción conserva su control independiente y aprobación requerida. Los servicios QA se usarán para la demostración; no ingresar datos contables reales.
