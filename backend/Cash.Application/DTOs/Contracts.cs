@@ -1,0 +1,11 @@
+namespace Cash.Application.DTOs;
+public sealed record OpenFundRequest(string Currency, decimal Amount);
+public sealed record AddFundsRequest(decimal Amount, string Reference);
+public sealed record CreateVoucherRequest(DateOnly Date, string Responsible, string Concept, decimal Amount);
+public sealed record CloseVoucherRequest(decimal Returned);
+public sealed record ReceiptInput(DateOnly Date, string Reference, decimal Amount, string FileName, string ContentType, byte[] Content);
+public sealed record ReceiptView(Guid Id, DateOnly Date, string Reference, decimal Amount, string FileName);
+public sealed record VoucherView(Guid Id, string Number, DateOnly Date, string Responsible, string Concept, decimal Amount, string Status, decimal Spent, decimal Returned, decimal Pending, DateTimeOffset? DeliveredAt, DateTimeOffset? ClosedAt, IReadOnlyList<ReceiptView> Receipts);
+public sealed record SummaryView(bool Configured, string? Currency, decimal Balance, decimal Outstanding, decimal Spent, int PendingCount, int DeliveredCount, int ClosedCount);
+public sealed record MovementView(Guid Id, DateTimeOffset At, string Type, string Detail, Guid? VoucherId, decimal Amount, decimal Balance);
+public sealed record ReportView(DateOnly From, DateOnly To, string Currency, IReadOnlyList<VoucherView> Vouchers, decimal Requested, decimal Spent, decimal Returned);
