@@ -30,7 +30,7 @@ jobs:
 
       - name: Escaneo de Secretos Expuestos (Cero Exposición)
         run: |
-          if grep -RInE "Password\s*=|User Id\s*=|AccountKey\s*=" backend/Books.Api/appsettings*.json backend/Books.Domain backend/Books.Application; then
+          if grep -RInE "Password\s*=|User Id\s*=|AccountKey\s*=" backend/Cash.Api/appsettings*.json backend/Cash.Domain backend/Cash.Application; then
             echo "❌ ERROR DE SEGURIDAD: Se detectaron credenciales hardcodeadas en el código o appsettings."
             exit 1
           fi
@@ -42,7 +42,7 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Ejecutar Tests Unitarios y de Clean Architecture (xUnit)
-        run: dotnet test backend/ --configuration Release
+        run: dotnet test backend/Cash.sln --configuration Release
 
   ti-gatekeeper-frontend:
     name: "Filtro TI: Frontend Tests & Build (React + TS)"
@@ -76,7 +76,7 @@ jobs:
   deploy-qa:
     name: "Fase 3: Deploy Automático a QA (Cloud Run)"
     needs: [ti-gatekeeper-backend, ti-gatekeeper-frontend]
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: vars.ENABLE_CLOUD_DEPLOYMENT == 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: qa
@@ -144,7 +144,7 @@ jobs:
   deploy-prod:
     name: "Fase 4: Pase a Producción (Aprobación TI)"
     needs: [deploy-qa]
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: vars.ENABLE_CLOUD_DEPLOYMENT == 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: production

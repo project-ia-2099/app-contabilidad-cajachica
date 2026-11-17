@@ -40,3 +40,16 @@
 - [x] **Tarea 7:** Establecer convención oficial de nombres de repositorios (`app-<area>-<nombre>`, máx. 35 caracteres) y aislamiento por esquemas SQL + Migraciones EF Core (`HasDefaultSchema` / `MigrationsHistoryTable`) para compartir la misma base de datos entre áreas.
 - [x] **Tarea 8:** Exigir lógica de negocio 100% en Backend (preparado para futura unificación por microservicios) y estandarizar el Frontend con Design System Minimalista Pastel, Font Awesome Free y cero emoticones Unicode.
 
+
+### Aplicación de vales de caja chica — alcance aprobado el 2026-11-17
+Usuario: uso interno de Contabilidad; una sola caja chica. Aprobado en el chat: vales con responsable, concepto e importe; entrega; rendición con comprobantes y devolución; saldo e historial; reportes.
+
+Decisiones de implementación: moneda y fondo inicial configurados por Contabilidad al abrir la caja; no precargar datos reales ni inventar saldos. Numeración correlativa; importes con dos decimales; no permitir entregas sin saldo ni cerrar rendiciones descuadradas. Comprobantes PDF/JPEG/PNG guardados en SQL con límite de 5 MB por archivo. Operaciones con control de concurrencia y trazabilidad. Una caja por instalación. Acceso local para revisión; autenticación corporativa y exposición a usuarios externos quedan pendientes de definición antes de habilitar un despliegue público.
+
+- [x] 1. Aprovisionar repositorio desde plantilla; verificar QA y producción con revisor requerido.
+- [x] 2. Aprobar y registrar alcance; crear rama feat/initial-app.
+- [x] 3. Implementar y validar solución Clean Architecture, API, migración aislada contabilidad_cajachica y reglas contables. Compilación sin advertencias; 17 pruebas backend aprobadas.
+- [x] 4. Implementar y validar interfaz React para configuración, vales, rendiciones, movimientos y reportes. Siete pruebas Vitest y dos flujos completos en Edge (escritorio y móvil) aprobados. Compilación TypeScript/Vite correcta; npm audit sin vulnerabilidades conocidas. Verificación visual de ambas resoluciones completada.
+- [x] 5. Documentar ejecución, preparar contenedores, revisar cambios y abrir PR sin fusionar. Entrega: https://github.com/project-ia-2099/app-contabilidad-cajachica/pull/1 (rama feat/initial-app).
+
+Validación final: 17 pruebas xUnit, 7 Vitest y 2 pruebas Edge (escritorio/móvil) aprobadas. TypeScript y build de producción correctos; npm audit: cero vulnerabilidades. Aplicación local iniciada con migración SQL y /health=ok; revisión mediante navegador real sin errores y caja sin datos de prueba. Scripts de inicio y parada, documentación y contenedores preparados. Docker no está disponible en esta máquina; no se ejecutó build de imágenes. SDK local 11.0.100 con destino y runtime .NET 10; CI y Docker usan SDK 10. Despliegue cloud deshabilitado hasta integrar acceso corporativo. Rama publicada y PR #1 abierto; sin fusión a main.

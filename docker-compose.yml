@@ -1,0 +1,30 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: ${SQL_PASSWORD:?Configure SQL_PASSWORD fuera del repositorio}
+      SQLCMDPASSWORD: ${SQL_PASSWORD:?Configure SQL_PASSWORD fuera del repositorio}
+    ports: ["127.0.0.1:14333:1433"]
+    volumes: ["cash-sql:/var/opt/mssql"]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      retries: 15
+      start_period: 30s
+  cash-api:
+    build: ./backend
+    environment:
+      ConnectionStrings__DefaultConnection: ${CASH_CONNECTION_STRING:?Configure la conexión al servicio sqlserver fuera del repositorio}
+      AllowedOrigins__0: http://127.0.0.1:5173
+    ports: ["127.0.0.1:5100:8080"]
+    depends_on:
+      sqlserver: { condition: service_healthy }
+  cash-web:
+    build:
+      context: ./frontend
+      args: { VITE_API_URL: "http://127.0.0.1:5100" }
+    ports: ["127.0.0.1:5173:8080"]
+    depends_on: [cash-api]
+volumes:
+  cash-sql:

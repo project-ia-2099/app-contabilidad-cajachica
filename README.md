@@ -1,45 +1,112 @@
-# App Template Fullstack (Golden Path - Vicoders)
+# Caja chica — Contabilidad
 
-Repositorio plantilla corporativo gobernado por TI para la creación de aplicaciones Fullstack asistidas por IA (**Codex / Antigravity**).
+Aplicación interna para una caja chica: apertura, vales correlativos, entrega de dinero, rendición con comprobantes, devolución, reposición, saldo, historial y reportes por período en CSV.
 
-> **Nota:** Este repositorio plantilla contiene únicamente la estructura de gobernanza, reglas (`Rules`), procedimientos (`Skills`), memoria del proyecto (`MEMORY.md`), pipelines CI/CD y documentación de uso. El código fuente de cada aplicación (`backend/` en .NET 10 Clean Architecture y `frontend/` en React + TypeScript con Node 26 LTS) es generado automáticamente por el agente mediante las **Skills y Rules** incluidas en `.agents/`.
+## Uso
 
----
+1. Abra la caja con una moneda (PEN, USD o EUR) y el fondo inicial real.
+2. Registre un vale con fecha, responsable, concepto e importe. Su número se asigna automáticamente; este registro todavía no descuenta saldo.
+3. En **Ver detalle → Registrar entrega**, confirme el dinero entregado. La API verifica el saldo y descuenta el importe.
+4. Agregue comprobantes PDF, PNG o JPEG, hasta 5 MB por archivo, indicando fecha, número e importe del gasto.
+5. Cierre la rendición indicando el dinero efectivamente devuelto. Los comprobantes más la devolución deben completar el importe del vale. El cierre incorpora la devolución al saldo y bloquea el vale.
+6. Use **Reponer fondo** para registrar ingresos adicionales con su referencia. **Movimientos** conserva el historial. **Reportes** filtra por fecha del vale y exporta su estado actual.
 
-## 📋 Contenido del Template
+No se precargan datos de demostración en la base contable. Los vales entregados sin gastos pueden cerrarse devolviendo el importe completo. No se permiten gastos mayores al importe del vale ni modificar vales cerrados. Esta primera versión no incluye anulación de vales, correcciones retroactivas ni varias cajas.
 
-| Archivo / Ruta | Propósito |
-| :--- | :--- |
-| [`MEMORY.md`](./MEMORY.md) | **Fuente de Verdad del proyecto.** Registra los planes aprobados por el usuario, decisiones de arquitectura y el estado secuencial de las tareas. |
-| [`AGENTS.md`](./AGENTS.md) | Reglas globales leídas automáticamente por **Codex**, **Antigravity** y **GitHub Copilot**. |
-| [`.agents/rules/golden-path-rules.md`](./.agents/rules/golden-path-rules.md) | Reglas inquebrantables (`always_on`): Conventional Commits v1.0.0, ramas obligatorias, PR siempre con `gh`, DRY, cero fallbacks silenciosos y cero datos sensibles. |
-| [`.agents/skills/scaffold-clean-fullstack/SKILL.md`](./.agents/skills/scaffold-clean-fullstack/SKILL.md) | Skill para inicializar la solución `.NET 10` en 4 capas de Clean Architecture + `React TS` (`Node 26 LTS`) + `Docker`. |
-| [`.agents/skills/add-crud-feature/SKILL.md`](./.agents/skills/add-crud-feature/SKILL.md) | Skill para implementar módulos de negocio capa por capa con pruebas obligatorias. |
-| [`.agents/skills/git-pr-workflow/SKILL.md`](./.agents/skills/git-pr-workflow/SKILL.md) | Skill para gestionar ramas, auditoría de secretos/archivos basura, Conventional Commits y creación de Pull Requests con `gh`. |
-| [`plan.md`](./plan.md) | Definición operativa de las 4 fases del **Golden Path** (Local, Filtro TI, QA en GCP y Pase a Producción). |
-| [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) | Criterios de auditoría automática para **GitHub Copilot Code Review** en cada Pull Request. |
-| [`.github/workflows/ci-cd.yml`](./.github/workflows/ci-cd.yml) | Pipeline automatizado: Filtro de TI (Tests + Clean Architecture + Cero Secretos), Despliegue a Cloud Run (QA) y Pase a Producción con aprobación de 1 clic. |
+## Ejecución local en Windows
 
----
+Requisitos: SDK compatible con .NET 10, runtime ASP.NET Core 10, Node.js 26, SQL Server local configurado por TI y variable de entorno `ConnectionStrings__DefaultConnection`. Nunca guarde esa variable ni credenciales en archivos versionados.
 
-## 🛡️ Las 11 Reglas de Oro del Flujo de Trabajo
+Desde la carpeta del proyecto:
 
-1. **Conventional Commits v1.0.0:** Todo commit sigue `<tipo>(<alcance>): <descripción>` (`feat`, `fix`, `docs`, `refactor`, `test`, `chore`, etc.).
-2. **Prohibido trabajar sobre `main`:** Todo cambio se implementa en una rama (`feat/*`, `fix/*`, `docs/*`, `chore/*`).
-3. **No Auto-Merge y Secuencialidad:** No se fusiona a `main` sin orden explícita del usuario y no se avanza a una tarea nueva sin terminar la anterior.
-4. **Uso obligatorio de `gh` CLI:** Todo cambio se sube al remoto y se gestiona mediante `gh`.
-5. **Pull Request (`PR`) siempre:** Cada entrega genera un PR hacia `main` (`gh pr create`).
-6. **Cero archivos basura:** No se suben archivos ajenos al core; ante cualquier duda, el agente pregunta al usuario.
-7. **Cero exposición de datos sensibles (3 Entornos Preconfigurados bajo `ConnectionStrings__DefaultConnection`):** Ninguna credencial o secreto en el repositorio:
-   * **Local:** Variable de entorno de sistema `ConnectionStrings__DefaultConnection` preconfigurada hacia SQL Server Local con autenticación integrada de Windows.
-   * **QA (Cloud Run):** Secreto `db-connection-string-qa` en **GCP Secret Manager** inyectado en `ConnectionStrings__DefaultConnection` apuntando a `BooksDb_QA`.
-   * **Producción (Cloud Run):** Secreto `db-connection-string-prod` en **GCP Secret Manager** inyectado en `ConnectionStrings__DefaultConnection` apuntando a `BooksDb_Prod` (requiere aprobación de 1 clic del Administrador de TI `888Leonidas888`).
-   * **Enlaces Oficiales de QA y Producción:** Se publican automáticamente en el **Resumen de GitHub Actions (`$GITHUB_STEP_SUMMARY`)**, en la sección **Deployments** del repositorio y son entregados en el chat por el agente tras cada despliegue.
-8. **Código DRY (Don't Repeat Yourself):** Reutilización obligatoria de lógica y componentes.
-9. **Cero fallbacks silenciosos:** Prohibido ocultar errores o asumir comportamientos; ante cualquier duda técnica se consulta al usuario.
-10. **Sincronización de `README.md` y `MEMORY.md`:** Ambos documentos se mantienen actualizados en cada entrega.
-11. **`MEMORY.md` como Fuente de Verdad:** Una vez aprobado el plan por el usuario, se registra en `MEMORY.md` antes de ejecutar.
-12. **Convención de Nombres (`app-<area>-<nombre>`):** Todo repositorio nuevo usa el formato `app-<area>-<nombre>` en minúsculas (`kebab-case`, máx. 35 caracteres) para compatibilidad directa con Cloud Run.
-13. **Esquemas SQL Aislados por Aplicación:** Aunque todas las áreas comparten la misma base de datos por entorno, cada aplicación aísla sus tablas en su propio esquema SQL (`<area>_<nombre>`) usando Migraciones EF Core (`Database.Migrate()`), prohibiendo `EnsureCreated()` y tablas en `dbo`.
-14. **Lógica de Negocio 100% en Backend:** Toda regla, cálculo o validación crítica reside exclusivamente en `.NET 10` (`Domain` / `Application`) para permitir futura unificación bajo arquitectura de microservicios.
-15. **Estándar UI Minimalista Pastel y Font Awesome Free:** Prohibido usar emoticones/emojis Unicode en la interfaz; todas las apps comparten paleta pastel minimalista e iconografía de **Font Awesome Free**.
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Start-Local.ps1
+```
+
+El iniciador compila, aplica las migraciones, comprueba SQL e inicia procesos sin ventanas de terminal. Interfaz: http://127.0.0.1:5173. API: http://127.0.0.1:5100. Solo se enlazan a la interfaz local de esta computadora. Registros e identificadores de procesos se guardan en `work/`, excluido de Git.
+
+Para detener las instancias creadas por el iniciador:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Stop-Local.ps1
+```
+
+Para desarrollo manual, inicie cada componente en una terminal:
+
+```powershell
+$env:AllowedOrigins__0 = 'http://127.0.0.1:5173'
+dotnet run --project backend/Cash.Api --urls http://127.0.0.1:5100
+```
+
+```powershell
+$env:VITE_API_URL = 'http://127.0.0.1:5100'
+npm ci --prefix frontend
+npm run dev --prefix frontend
+```
+
+## Pruebas
+
+```powershell
+dotnet test backend/Cash.sln --configuration Release
+npm test --prefix frontend
+npm run build --prefix frontend
+npm audit --prefix frontend
+```
+
+Las 17 pruebas backend verifican arquitectura, numeración, saldo, estados, archivos, conciliación, historial, concurrencia, reportes y neutralización de fórmulas en CSV. Usan integración HTTP con EF InMemory; la migración y conexión SQL se comprueban por separado al iniciar la aplicación local.
+
+Las siete pruebas de interfaz verifican apertura, registro, errores, adjuntos, reportes y fallos de actualización después de guardar. Dos pruebas de navegador completan el ciclo en escritorio y móvil, verifican el PDF multipart y la descarga CSV. Usan una API controlada de prueba y no escriben datos en la caja real.
+
+Para ver las pruebas en una ventana de Edge:
+
+```powershell
+$env:PLAYWRIGHT_CHANNEL = 'msedge'
+$env:PLAYWRIGHT_SLOW_MO = '400'
+npm run test:browser:visible --prefix frontend
+```
+
+Para segundo plano, use `npm run test:browser --prefix frontend`. Sin `PLAYWRIGHT_CHANNEL`, instale Chromium con `npx --prefix frontend playwright install chromium`. Las pruebas usan el puerto 5175; resultados y capturas se excluyen de Git.
+
+## Arquitectura y persistencia
+
+- `backend/Cash.Domain`: entidades y contrato de repositorio, sin dependencias de persistencia.
+- `backend/Cash.Application`: reglas contables, DTOs y servicios; solo depende de Domain.
+- `backend/Cash.Infrastructure`: EF Core 10, SQL Server, repositorios y migraciones.
+- `backend/Cash.Api`: Minimal APIs, errores explícitos, CORS por lista de orígenes y `/health` con comprobación de base de datos.
+- `backend/Cash.Tests`: xUnit, integración HTTP y arquitectura.
+- `frontend`: React, TypeScript, Vite, Vitest, Playwright, Inter local y Font Awesome Free. Los cálculos y reglas contables están en el backend.
+
+Todas las tablas y el historial EF usan el esquema `contabilidad_cajachica`. Las mutaciones modifican una revisión de la caja para detectar concurrencia y se guardan mediante una única llamada transaccional de EF en SQL Server. Las respuestas 409 requieren actualizar la vista. Comprobantes y metadatos se conservan en SQL; no se guardan datos contables en el navegador. El historial registra operaciones y fechas; la identificación individual de operadores depende de la futura autenticación.
+
+Para generar migraciones:
+
+```powershell
+dotnet tool restore
+dotnet ef migrations add NombreDelCambio --project backend/Cash.Infrastructure --startup-project backend/Cash.Api
+```
+
+## API
+
+| Método | Ruta | Función |
+| --- | --- | --- |
+| GET | `/health` | Verifica acceso a la base de datos |
+| GET | `/api/summary` | Saldo, moneda e indicadores |
+| POST | `/api/fund` | Abre la única caja |
+| POST | `/api/fund/top-ups` | Registra reposición |
+| GET, POST | `/api/vouchers` | Lista o registra vales |
+| GET | `/api/vouchers/{id}` | Detalle y comprobantes |
+| POST | `/api/vouchers/{id}/deliver` | Registra entrega |
+| POST | `/api/vouchers/{id}/receipts` | Multipart: date, reference, amount, file |
+| POST | `/api/vouchers/{id}/close` | Cierra con devolución |
+| GET | `/api/receipts/{id}` | Descarga comprobante |
+| GET | `/api/movements` | Historial |
+| GET | `/api/reports?from=AAAA-MM-DD&to=AAAA-MM-DD` | Reporte por fecha del vale |
+| GET | `/api/reports/export?from=AAAA-MM-DD&to=AAAA-MM-DD` | CSV |
+
+## Contenedores y revisión
+
+Los Dockerfiles usan .NET 10 y Node 26, con nginx en el frontend. `docker compose up --build` requiere `SQL_PASSWORD` y `CASH_CONNECTION_STRING` desde el entorno, fuera del repositorio; la conexión debe apuntar al servicio `sqlserver`. El volumen `cash-sql` conserva datos. Los puertos publicados se limitan a 127.0.0.1.
+
+El repositorio tiene entornos QA y producción; producción requiere revisión de TI. El workflow comprueba backend e interfaz en cada PR. El despliegue cloud queda deshabilitado por defecto: esta versión no incluye autenticación corporativa. Antes de habilitar `ENABLE_CLOUD_DEPLOYMENT=true`, TI debe integrar el acceso autorizado y configurar `AllowedOrigins` con la URL del frontend. No publique esta versión con acceso público a los datos contables.
+
+Los cambios se entregan en una rama y un Pull Request, sin fusionarse automáticamente a `main`.
